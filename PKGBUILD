@@ -13,7 +13,7 @@ source=('local://create-my-signed-boot-cert'
         'local://99-my-signed-boot.hook')
 sha256sums=('cc633f26482422277797d24b04b3d287db65cb1252671b0c86a42f15e5eed7b5'
             '97afcfb8c02c2a3a3fc26c840501e61b503a7b97b2b21765696d65c6f154df2a'
-            '77457d678b2725c509ce81c4ce55b89cb8f2542b4d2687e52d831d9daf731302'
+            '3539f4122de1e081e844fbb6ac21b4ef1dd416775d6b8105395ea5d1a2b91bf4'
             '4ac82b8b55662f1067b74d72ea7080b8a116a912c08d84e98a6f555cdd3c239c')
 
 package() {

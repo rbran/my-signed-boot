@@ -7,14 +7,14 @@ arch=('any')
 url="https://bitbucket.org/e760d50e/my-signed-boot"
 license=('GPL3')
 depends=('systemd' 'efitools' 'sbsigntools' 'util-linux')
-source=(local://create-my-signed-boot-cert
-	    local://kernel-command-line-old.txt
-	    local://create-my-signed-boot-image
-	    local://99-my-signed-boot.hook)
-sha256sums=('39c10432d3377da0e31898d93a038a0c1f0d43b8cdd73048b1bd6b5bef98aaa3'
-            'bba66c889f16e26304f591d4c203c4841cc81c14166c570a1abf7d5a0e6d30ed'
-            '77561ea4707c33d7d942da18278726a48dfbfb4712f703305fe35ff51181905b'
-            '07fc0e36848771204ec44ad3c976e4daaa77658793e9f77e035555f1d2817fce')
+source=('local://create-my-signed-boot-cert'
+        'local://kernel-command-line-old.txt'
+        'local://create-my-signed-boot-image'
+        'local://99-my-signed-boot.hook')
+sha256sums=('cc633f26482422277797d24b04b3d287db65cb1252671b0c86a42f15e5eed7b5'
+            '97afcfb8c02c2a3a3fc26c840501e61b503a7b97b2b21765696d65c6f154df2a'
+            'cde039015d06346a11b07d8df5e90e57fd12f04afcbf75e3657ba20babe01a01'
+            '4ac82b8b55662f1067b74d72ea7080b8a116a912c08d84e98a6f555cdd3c239c')
 
 package() {
   cd "$srcdir/"

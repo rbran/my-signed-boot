@@ -1,0 +1,1 @@
+cryptdevice=/dev/disk/by-partlabel/root:root:allow-discards root=/dev/mapper/root rw

@@ -1,0 +1,51 @@
+#!/bin/bash
+# Copyright (c) 2015 by Roderick W. Smith
+# Licensed under the terms of the GPL v3
+
+
+NAME=$(cat /etc/hostname)
+
+if [ -z "$NAME" ]; then
+    echo -n "Enter a Common Name to embed in the keys: "
+    read NAME
+fi
+
+PREFIX="/etc/my-signed-boot"
+
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout ${PREFIX}/PK.key \
+        -out ${PREFIX}/PK.crt -days 3650 -nodes -sha256
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME KEK/" -keyout ${PREFIX}/KEK.key \
+        -out ${PREFIX}/KEK.crt -days 3650 -nodes -sha256
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DB/" -keyout ${PREFIX}/DB.key \
+        -out ${PREFIX}/DB.crt -days 3650 -nodes -sha256
+openssl x509 -in ${PREFIX}/PK.crt -out ${PREFIX}/PK.cer -outform DER
+openssl x509 -in ${PREFIX}/KEK.crt -out ${PREFIX}/KEK.cer -outform DER
+openssl x509 -in ${PREFIX}/DB.crt -out ${PREFIX}/DB.cer -outform DER
+
+uuidgen --random > ${PREFIX}/myGUID.txt
+GUID=$(cat ${PREFIX}/myGUID.txt)
+
+cert-to-efi-sig-list -g $GUID ${PREFIX}/PK.crt ${PREFIX}/PK.esl
+cert-to-efi-sig-list -g $GUID ${PREFIX}/KEK.crt ${PREFIX}/KEK.esl
+cert-to-efi-sig-list -g $GUID ${PREFIX}/DB.crt ${PREFIX}/DB.esl
+rm -f ${PREFIX}/noPK.esl
+touch ${PREFIX}/noPK.esl
+
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k ${PREFIX}/PK.key -c ${PREFIX}/PK.crt PK ${PREFIX}/PK.esl ${PREFIX}/PK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k ${PREFIX}/PK.key -c ${PREFIX}/PK.crt PK ${PREFIX}/noPK.esl ${PREFIX}/noPK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k ${PREFIX}/PK.key -c ${PREFIX}/PK.crt KEK ${PREFIX}/KEK.esl ${PREFIX}/KEK.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+                  -k ${PREFIX}/KEK.key -c ${PREFIX}/KEK.crt db ${PREFIX}/DB.esl ${PREFIX}/DB.auth
+
+# TODO: this allow an race condition
+chmod 0600 "${PREFIX}"/*.key
+
+echo ""
+echo ""
+echo "For use with KeyTool, copy the *.auth and *.esl files to a FAT USB"
+echo "flash drive or to your EFI System Partition (ESP)."
+echo "For use with most UEFIs' built-in key managers, copy the *.cer files."
+echo ""
